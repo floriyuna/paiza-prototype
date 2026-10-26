@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f4f7f9;
+  color: #333333;
+  font-family: var(--font-noto), "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid #00a3da;
+  outline-offset: 2px;
+}
+
+/* ---------- ゲームステージのアニメーション ---------- */
+
+/* ジャンプ（--jump-y で高さを変える） */
+@keyframes char-jump {
+  0% { transform: translateY(0) scaleY(1); }
+  15% { transform: translateY(0) scaleY(0.85); }
+  50% { transform: translateY(var(--jump-y, -80px)) scaleY(1.05); }
+  85% { transform: translateY(0) scaleY(0.9); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+.anim-jump {
+  animation: char-jump 1s ease-in-out 2;
+}
+
+/* 力がなくて動けない */
+@keyframes char-wobble {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-5px) rotate(-4deg); }
+  40% { transform: translateX(5px) rotate(4deg); }
+  60% { transform: translateX(-4px) rotate(-3deg); }
+  80% { transform: translateX(3px) rotate(2deg); }
+}
+.anim-wobble {
+  animation: char-wobble 0.7s ease-in-out 3;
+}
+
+/* 地面にめり込む */
+@keyframes char-sink {
+  0% { transform: translateY(0) scaleY(1); }
+  40% { transform: translateY(16px) scaleY(0.6); }
+  100% { transform: translateY(12px) scaleY(0.7); }
+}
+.anim-sink {
+  animation: char-sink 1.2s ease-out forwards;
+}
+
+/* 走る */
+@keyframes run-full {
+  from { left: 4%; }
+  to { left: 84%; }
+}
+.anim-run-full {
+  animation: run-full 3.2s linear forwards;
+}
+@keyframes run-crash {
+  from { left: 4%; }
+  to { left: calc(50% - 50px); }
+}
+.anim-run-crash {
+  animation: run-crash 2.4s linear forwards;
+}
+.anim-run-crash-short {
+  animation: run-crash 2.4s linear forwards;
+}
+
+/* ちょうどよいタイミングのジャンプ（3.2秒のうち 28%〜86%、障害物の真上を通る） */
+@keyframes hop-right {
+  0%, 28% { transform: translateY(0); }
+  40% { transform: translateY(-60px); }
+  57% { transform: translateY(-76px); }
+  74% { transform: translateY(-60px); }
+  86%, 100% { transform: translateY(0); }
+}
+.anim-hop-right {
+  animation: hop-right 3.2s linear forwards;
+}
+
+/* 早すぎるジャンプ（2.4秒のうち 6%〜34%） */
+@keyframes hop-early {
+  0%, 6% { transform: translateY(0); }
+  20% { transform: translateY(-72px); }
+  34%, 100% { transform: translateY(0); }
+}
+.anim-hop-early {
+  animation: hop-early 2.4s linear forwards;
+}
+
+/* ぶつかる */
+@keyframes crash-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-6px) rotate(-8deg); }
+  75% { transform: translateX(6px) rotate(8deg); }
+}
+.anim-crash {
+  animation: crash-shake 0.4s ease-in-out 2;
+}
+
+/* コイン */
+@keyframes coin-pop {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  60% { transform: translateY(-22px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-34px) scale(0.6); opacity: 0; }
+}
+.anim-coin-pop {
+  animation: coin-pop 0.5s ease-out forwards;
+}
+
+/* 変数の値が変わったときのポップ */
+@keyframes value-pop {
+  0% { transform: scale(0.7); background-color: #fff3d6; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.anim-value-pop {
+  animation: value-pop 0.45s ease-out;
+}
+
+/* 正解の演出 */
+@keyframes banner-in {
+  0% { transform: translateY(8px) scale(0.96); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.anim-banner-in {
+  animation: banner-in 0.35s ease-out both;
+}
+
+@keyframes badge-in {
+  0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(8deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.anim-badge-in {
+  animation: badge-in 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(260px) rotate(540deg); opacity: 0; }
+}
+.anim-confetti {
+  animation: confetti-fall 2.4s ease-in both;
+}
+
+/* 目を引くが邪魔にならない呼吸アニメーション（トップのCTA） */
+@keyframes gentle-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 136, 0, 0.45); }
+  50% { box-shadow: 0 0 0 10px rgba(255, 136, 0, 0); }
+}
+.anim-cta-pulse {
+  animation: gentle-pulse 2.4s ease-in-out infinite;
+}
+
+/* 動きを減らす設定のユーザーには、アニメーションを一瞬で終わらせる */
+@media (prefers-reduced-motion: reduce) {
+  .anim-jump,
+  .anim-wobble,
+  .anim-sink,
+  .anim-run-full,
+  .anim-run-crash,
+  .anim-run-crash-short,
+  .anim-hop-right,
+  .anim-hop-early,
+  .anim-crash,
+  .anim-coin-pop,
+  .anim-value-pop,
+  .anim-banner-in,
+  .anim-badge-in,
+  .anim-confetti,
+  .anim-cta-pulse {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
