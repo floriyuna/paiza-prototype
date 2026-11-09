@@ -233,8 +233,10 @@ export default function BugGame({ question: q, onAttempt, onFinish }: Props) {
                       )}
                     </div>
 
-                    <div className="font-mono text-xs font-bold text-slate-900 bg-slate-900 text-emerald-400 px-2.5 py-1.5 rounded-[2px]">
-                      {opt.line}
+                    {/* 選択肢のコード表示（くっきり視認性の高いスタイル） */}
+                    <div className="font-mono text-xs sm:text-sm font-bold bg-[#1e293b] text-[#38bdf8] px-3 py-2 rounded-[4px] border border-slate-700 shadow-inner flex items-center justify-between">
+                      <code className="text-[#38bdf8] font-bold">{opt.line}</code>
+                      <span className="text-[10px] text-slate-400 font-sans font-normal">Python</span>
                     </div>
 
                     {hasExecuted && isSelected && (

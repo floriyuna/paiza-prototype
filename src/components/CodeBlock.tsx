@@ -100,20 +100,21 @@ export default function CodeBlock({
       </div>
 
       {/* エディタコードエリア */}
-      <pre className="overflow-x-auto py-2.5 font-mono text-xs sm:text-sm leading-6 sm:leading-7 text-slate-200" tabIndex={0}>
+      <pre className="overflow-x-auto py-2.5 font-mono text-xs sm:text-sm leading-6 sm:leading-7 text-slate-100 bg-[#1a222d]" tabIndex={0}>
         <code>
           {lines.map((line, i) => {
             const isTarget = i === highlight;
             return (
               <span
                 key={i}
-                className={`flex border-l-4 border-transparent px-3 transition-colors ${isTarget ? TONE_CLASSES[tone] : ""
-                  }`}
+                className={`flex border-l-4 border-transparent px-3 transition-colors ${
+                  isTarget ? TONE_CLASSES[tone] : ""
+                }`}
               >
                 <span className="mr-4 w-6 shrink-0 select-none text-right font-mono text-xs text-slate-500">
                   {i + 1}
                 </span>
-                <span className="whitespace-pre flex-1">
+                <span className="whitespace-pre flex-1 text-slate-100">
                   {line === "" ? " " : highlightPython(line)}
                 </span>
                 {isTarget && (
