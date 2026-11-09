@@ -35,7 +35,6 @@ export default function LearnClient() {
   const question = getQuestion(level, type);
   const clearedIds = Object.keys(state.cleared);
 
-  // 画面の進行状態（問題ごとに「あそぶ→解説→達成」）
   const [ps, setPs] = useState<{ qid: string; phase: Phase; run: number }>({ qid: "", phase: "play", run: 0 });
   const phase: Phase = ps.qid === question.id ? ps.phase : "play";
   const run = ps.qid === question.id ? ps.run : 0;
@@ -87,45 +86,46 @@ export default function LearnClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F7F9] pb-16">
-      {/* 1. レッスン上部パンくず / ナビゲーションバー */}
-      <div className="border-b border-slate-200 bg-white py-3">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <Link href="/" className="hover:text-[#00A3DA] transition flex items-center gap-1 font-bold">
-              <ChevronLeft className="h-4 w-4" />
-              ラーニングトップ
+    <div className="min-h-screen bg-[#f5f7fa] text-[#333333] pb-16">
+      {/* 1. 本家のパンくずリスト */}
+      <div className="border-b border-[#ededed] bg-white py-2 text-xs text-[#6e7687]">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between px-4">
+          <div className="flex items-center gap-1.5">
+            <Link href="/" className="hover:text-[#0d6bd3] hover:underline">
+              paizaトップ
             </Link>
-            <span>/</span>
-            <span className="text-slate-800 font-bold">体験レッスン</span>
+            <span>&gt;</span>
+            <Link href="/" className="hover:text-[#0d6bd3] hover:underline">
+              学習トップ
+            </Link>
+            <span>&gt;</span>
+            <span className="font-bold text-[#333333]">体験レッスン</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-bold text-emerald-700">
-              登録不要・ゲストモード
-            </span>
-          </div>
+          <span className="rounded-[2px] bg-[#f6faff] border border-[#d2e3fc] px-2 py-0.5 text-[10px] font-bold text-[#0d6bd3]">
+            登録不要・ゲストモード
+          </span>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-6">
-        {/* 2. 操作コントロールバー（難易度 & ゲーム/クイズ切り替え） */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-4 border border-slate-200 shadow-sm">
+      <div className="mx-auto max-w-[1240px] px-4 py-6">
+        {/* 2. 操作コントロールバー */}
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[4px] bg-white p-3 border border-[#d7e0e2] shadow-xs">
           <LevelSwitcher level={level} onChange={changeLevel} />
 
-          <div role="tablist" aria-label="学習モード切り替え" className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+          <div role="tablist" aria-label="学習モード切り替え" className="flex items-center gap-1 bg-[#f0f2f5] p-1 rounded-[4px]">
             <button
               type="button"
               role="tab"
               aria-selected={type === "bug"}
               onClick={() => changeType("bug")}
-              className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 rounded-[2px] px-3.5 py-1.5 text-xs font-bold transition ${
                 type === "bug"
-                  ? "bg-white text-[#E05397] shadow-sm font-black"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-[#0d6bd3] shadow-xs font-bold"
+                  : "text-[#555555] hover:text-[#333333]"
               }`}
             >
-              <Bug className="h-4 w-4" />
+              <Bug className="h-3.5 w-3.5" />
               バグ修正ゲーム
             </button>
             <button
@@ -133,37 +133,20 @@ export default function LearnClient() {
               role="tab"
               aria-selected={type === "quiz"}
               onClick={() => changeType("quiz")}
-              className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 rounded-[2px] px-3.5 py-1.5 text-xs font-bold transition ${
                 type === "quiz"
-                  ? "bg-white text-[#00A3DA] shadow-sm font-black"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-[#0d6bd3] shadow-xs font-bold"
+                  : "text-[#555555] hover:text-[#333333]"
               }`}
             >
-              <Brain className="h-4 w-4" />
+              <Brain className="h-3.5 w-3.5" />
               結果予想クイズ
             </button>
           </div>
         </div>
 
-        {/* 初回訪問時のヒント */}
-        {hydrated && !state.surveyDone && phase === "play" && (
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#E6F6FC] border border-sky-200 px-4 py-3 text-xs md:text-sm text-slate-700">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#00A3DA] shrink-0" />
-              <span>まずは「初心者」向けの問題を表示しています。</span>
-            </div>
-            <Link
-              href="/survey"
-              className="inline-flex items-center gap-1 font-bold text-[#00A3DA] hover:underline"
-            >
-              2問の簡単な質問でレベルを診断する
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        )}
-
         {/* 3. メインエリア ＋ 右サイドバー */}
-        <div className="grid gap-6 lg:grid-cols-12">
+        <div className="grid gap-5 lg:grid-cols-12">
           {/* メインステージ（9/12） */}
           <div className="min-w-0 lg:col-span-9">
             {phase === "play" &&
@@ -189,28 +172,28 @@ export default function LearnClient() {
                   <button
                     type="button"
                     onClick={() => setPhase("achievement")}
-                    className="anim-cta-pulse inline-flex items-center gap-2 rounded-full bg-[#FF8800] hover:bg-[#e67a00] px-7 py-3.5 text-base font-black text-white shadow-lg shadow-orange-500/25 transition active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-[4px] bg-[#ff8800] hover:bg-[#e67a00] px-6 py-3 text-sm font-bold text-white shadow-xs transition"
                   >
-                    <Sparkles className="h-5 w-5" />
-                    クリアの成果・バッジを見る
-                    <ArrowRight className="h-5 w-5" />
+                    <Sparkles className="h-4 w-4" />
+                    クリアの成果を見る
+                    <ArrowRight className="h-4 w-4" />
                   </button>
                 ) : (
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => goTo(nextQuestion(question, clearedIds))}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#FF8800] hover:bg-[#e67a00] px-6 py-3 text-sm font-black text-white shadow-md transition"
+                      className="inline-flex items-center gap-1.5 rounded-[4px] bg-[#ff8800] hover:bg-[#e67a00] px-5 py-2.5 text-xs font-bold text-white shadow-xs transition"
                     >
-                      <Repeat className="h-4 w-4" />
-                      次の問題に挑戦する
+                      <Repeat className="h-3.5 w-3.5" />
+                      次の問題へ進む
                     </button>
                     <button
                       type="button"
                       onClick={() => goTo(getQuestion(level, otherType(type)))}
-                      className="inline-flex items-center gap-2 rounded-full border-2 border-[#00A3DA] bg-white px-6 py-3 text-sm font-black text-[#00A3DA] hover:bg-sky-50 transition"
+                      className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#0d6bd3] bg-white px-5 py-2.5 text-xs font-bold text-[#0d6bd3] hover:bg-[#f6faff] transition"
                     >
-                      <Gamepad2 className="h-4 w-4" />
+                      <Gamepad2 className="h-3.5 w-3.5" />
                       別のゲームを遊ぶ
                     </button>
                   </div>
@@ -227,8 +210,8 @@ export default function LearnClient() {
             )}
           </div>
 
-          {/* 右サイドバー（3/12）：問題一覧 & レッスンナビゲーション */}
-          <div className="lg:col-span-3 space-y-4">
+          {/* 右サイドバー（3/12） */}
+          <div className="lg:col-span-3">
             <QuestionList currentId={question.id} clearedIds={clearedIds} onSelect={goTo} />
           </div>
         </div>
