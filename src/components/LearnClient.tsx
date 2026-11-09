@@ -3,7 +3,16 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Brain, Bug, Gamepad2, Repeat, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Brain,
+  Bug,
+  ChevronLeft,
+  ChevronRight,
+  Gamepad2,
+  Repeat,
+  Sparkles,
+} from "lucide-react";
 import Achievement from "./Achievement";
 import BugGame from "./BugGame";
 import CodeQuiz from "./CodeQuiz";
@@ -78,122 +87,152 @@ export default function LearnClient() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      {/* 操作バー */}
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-        <LevelSwitcher level={level} onChange={changeLevel} />
+    <div className="min-h-screen bg-[#F4F7F9] pb-16">
+      {/* 1. レッスン上部パンくず / ナビゲーションバー */}
+      <div className="border-b border-slate-200 bg-white py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <Link href="/" className="hover:text-[#00A3DA] transition flex items-center gap-1 font-bold">
+              <ChevronLeft className="h-4 w-4" />
+              ラーニングトップ
+            </Link>
+            <span>/</span>
+            <span className="text-slate-800 font-bold">体験レッスン</span>
+          </div>
 
-        <div role="tablist" aria-label="あそびかた" className="inline-flex gap-2">
-          <TabButton active={type === "bug"} onClick={() => changeType("bug")} icon={<Bug className="h-4 w-4" aria-hidden />}>
-            バグ修正ゲーム
-          </TabButton>
-          <TabButton active={type === "quiz"} onClick={() => changeType("quiz")} icon={<Brain className="h-4 w-4" aria-hidden />}>
-            結果予想クイズ
-          </TabButton>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-bold text-emerald-700">
+              登録不要・ゲストモード
+            </span>
+          </div>
         </div>
       </div>
 
-      {hydrated && !state.surveyDone && phase === "play" && (
-        <p className="mb-4 flex flex-wrap items-center gap-x-2 rounded-card bg-paiza-blue-soft px-3 py-2 text-sm">
-          <Sparkles className="h-4 w-4 text-paiza-blue" aria-hidden />
-          まずは「初心者」向けの問題を出しています。
-          <Link href="/survey" className="font-bold text-paiza-blue-dark underline">
-            2問の質問でレベルを判定する
-          </Link>
-        </p>
-      )}
+      <div className="mx-auto max-w-7xl px-4 py-6">
+        {/* 2. 操作コントロールバー（難易度 & ゲーム/クイズ切り替え） */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-4 border border-slate-200 shadow-sm">
+          <LevelSwitcher level={level} onChange={changeLevel} />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-        <div role="tabpanel" aria-label={type === "bug" ? "バグ修正ゲーム" : "結果予想クイズ"} className="min-w-0">
-          {phase === "play" &&
-            (question.kind === "bug" ? (
-              <BugGame key={`${question.id}-${run}`} question={question} onAttempt={handleAttempt} onFinish={finishPlay} />
-            ) : (
-              <CodeQuiz key={`${question.id}-${run}`} question={question} onAttempt={handleAttempt} onFinish={finishPlay} />
-            ))}
-
-          {phase === "explain" && (
-            <ExplanationView question={question}>
-              {!state.achievementSeen ? (
-                <button
-                  type="button"
-                  onClick={() => setPhase("achievement")}
-                  className="anim-cta-pulse inline-flex items-center gap-2 rounded-full bg-paiza-orange px-7 py-3.5 text-lg font-black text-paiza-ink hover:bg-paiza-orange-dark"
-                >
-                  <Sparkles className="h-5 w-5" aria-hidden />
-                  クリアの成果を見る
-                  <ArrowRight className="h-5 w-5" aria-hidden />
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => goTo(nextQuestion(question, clearedIds))}
-                    className="inline-flex items-center gap-2 rounded-full bg-paiza-orange px-6 py-3 font-black text-paiza-ink hover:bg-paiza-orange-dark"
-                  >
-                    <Repeat className="h-4 w-4" aria-hidden />
-                    もう一問挑戦する
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => goTo(getQuestion(level, otherType(type)))}
-                    className="inline-flex items-center gap-2 rounded-full border-2 border-paiza-blue px-6 py-3 font-black text-paiza-blue-dark hover:bg-paiza-blue-soft"
-                  >
-                    <Gamepad2 className="h-4 w-4" aria-hidden />
-                    別のゲームを遊ぶ
-                  </button>
-                </>
-              )}
-            </ExplanationView>
-          )}
-
-          {phase === "achievement" && (
-            <Achievement
-              question={question}
-              onContinueAsGuest={() => leaveAchievement("guest")}
-              onSignup={() => leaveAchievement("signup")}
-            />
-          )}
+          <div role="tablist" aria-label="学習モード切り替え" className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={type === "bug"}
+              onClick={() => changeType("bug")}
+              className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+                type === "bug"
+                  ? "bg-white text-[#E05397] shadow-sm font-black"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Bug className="h-4 w-4" />
+              バグ修正ゲーム
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={type === "quiz"}
+              onClick={() => changeType("quiz")}
+              className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+                type === "quiz"
+                  ? "bg-white text-[#00A3DA] shadow-sm font-black"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Brain className="h-4 w-4" />
+              結果予想クイズ
+            </button>
+          </div>
         </div>
 
-        <aside className="space-y-4">
-          <QuestionList currentId={question.id} clearedIds={clearedIds} onSelect={goTo} />
-          <p className="rounded-card bg-white p-3 text-xs leading-relaxed text-paiza-sub shadow-card">
-            クリア状況：<strong className="text-paiza-ink">{clearedIds.length} / {ALL_QUESTIONS.length}</strong>
-            <br />
-            学習状況はこのブラウザにだけ保存されます（登録は不要です）。
-          </p>
-        </aside>
+        {/* 初回訪問時のヒント */}
+        {hydrated && !state.surveyDone && phase === "play" && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#E6F6FC] border border-sky-200 px-4 py-3 text-xs md:text-sm text-slate-700">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-[#00A3DA] shrink-0" />
+              <span>まずは「初心者」向けの問題を表示しています。</span>
+            </div>
+            <Link
+              href="/survey"
+              className="inline-flex items-center gap-1 font-bold text-[#00A3DA] hover:underline"
+            >
+              2問の簡単な質問でレベルを診断する
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
+
+        {/* 3. メインエリア ＋ 右サイドバー */}
+        <div className="grid gap-6 lg:grid-cols-12">
+          {/* メインステージ（9/12） */}
+          <div className="min-w-0 lg:col-span-9">
+            {phase === "play" &&
+              (question.kind === "bug" ? (
+                <BugGame
+                  key={`${question.id}-${run}`}
+                  question={question}
+                  onAttempt={handleAttempt}
+                  onFinish={finishPlay}
+                />
+              ) : (
+                <CodeQuiz
+                  key={`${question.id}-${run}`}
+                  question={question}
+                  onAttempt={handleAttempt}
+                  onFinish={finishPlay}
+                />
+              ))}
+
+            {phase === "explain" && (
+              <ExplanationView question={question}>
+                {!state.achievementSeen ? (
+                  <button
+                    type="button"
+                    onClick={() => setPhase("achievement")}
+                    className="anim-cta-pulse inline-flex items-center gap-2 rounded-full bg-[#FF8800] hover:bg-[#e67a00] px-7 py-3.5 text-base font-black text-white shadow-lg shadow-orange-500/25 transition active:scale-95"
+                  >
+                    <Sparkles className="h-5 w-5" />
+                    クリアの成果・バッジを見る
+                    <ArrowRight className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => goTo(nextQuestion(question, clearedIds))}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#FF8800] hover:bg-[#e67a00] px-6 py-3 text-sm font-black text-white shadow-md transition"
+                    >
+                      <Repeat className="h-4 w-4" />
+                      次の問題に挑戦する
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goTo(getQuestion(level, otherType(type)))}
+                      className="inline-flex items-center gap-2 rounded-full border-2 border-[#00A3DA] bg-white px-6 py-3 text-sm font-black text-[#00A3DA] hover:bg-sky-50 transition"
+                    >
+                      <Gamepad2 className="h-4 w-4" />
+                      別のゲームを遊ぶ
+                    </button>
+                  </div>
+                )}
+              </ExplanationView>
+            )}
+
+            {phase === "achievement" && (
+              <Achievement
+                question={question}
+                onContinueAsGuest={() => leaveAchievement("guest")}
+                onSignup={() => leaveAchievement("signup")}
+              />
+            )}
+          </div>
+
+          {/* 右サイドバー（3/12）：問題一覧 & レッスンナビゲーション */}
+          <div className="lg:col-span-3 space-y-4">
+            <QuestionList currentId={question.id} clearedIds={clearedIds} onSelect={goTo} />
+          </div>
+        </div>
       </div>
     </div>
-  );
-}
-
-function TabButton({
-  active,
-  onClick,
-  icon,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-full border-2 px-4 py-2 text-sm font-black transition ${
-        active
-          ? "border-paiza-blue bg-paiza-blue text-white"
-          : "border-paiza-line bg-white text-paiza-ink hover:border-paiza-blue"
-      }`}
-    >
-      {icon}
-      {children}
-    </button>
   );
 }
